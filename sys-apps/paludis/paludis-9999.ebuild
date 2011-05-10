@@ -3,19 +3,17 @@
 # $Header: $
 
 EAPI="paludis-1"
-
-SCM_REPOSITORY="git://git.pioto.org/paludis.git"
-SCM_CHECKOUT_TO="${DISTDIR}/git-src/paludis"
-inherit scm-git bash-completion eutils
+inherit bash-completion eutils git-2
 
 DESCRIPTION="paludis, the other package mangler"
 HOMEPAGE="http://paludis.pioto.org/"
 SRC_URI=""
+EGIT_REPO_URI="git://git.pioto.org/paludis.git"
 
 CLIENTS_USE="accerso appareo instruo"
 
 IUSE="${CLIENTS_USE}
-ask cran doc gemcutter pbins pink portage python-bindings ruby-bindings search-index sort-world vim-syntax visibility xml zsh-completion"
+ask doc gemcutter pbins pink portage python-bindings ruby-bindings search-index sort-world vim-syntax visibility xml zsh-completion"
 LICENSE="GPL-2 vim-syntax? ( vim )"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
@@ -32,7 +30,7 @@ COMMON_DEPEND="
 	search-index? ( dev-db/sqlite:3 )"
 
 DEPEND="${COMMON_DEPEND}
-    app-text/asciidoc
+    >=app-text/asciidoc-8.6.3
     app-text/xmlto
 	sys-devel/autoconf:2.5
 	sys-devel/automake:1.11
@@ -42,7 +40,8 @@ DEPEND="${COMMON_DEPEND}
 		python-bindings? ( dev-python/epydoc dev-python/pygments )
 		ruby-bindings? ( dev-ruby/syntax dev-ruby/allison )
 	)
-	dev-util/pkgconfig"
+	dev-util/pkgconfig
+	dev-util/gtest"
 
 RDEPEND="${COMMON_DEPEND}
 	sys-apps/sandbox"
@@ -60,8 +59,6 @@ PDEPEND="
 		net-misc/rsync
 		net-misc/wget"
 
-PROVIDE="virtual/portage"
-
 create-paludis-user() {
 	enewgroup "paludisbuild"
 	enewuser "paludisbuild" -1 -1 "/var/tmp/paludis" "paludisbuild,tty"
@@ -78,7 +75,7 @@ pkg_setup() {
 }
 
 src_unpack() {
-	scm_src_unpack
+	git-2_src_unpack
 	cd "${S}"
 	use sort-world && epatch ${FILESDIR}/0001-paludis-sort-world.patch
 	use ask && epatch ${FILESDIR}/0002-cave-resolve-ask.patch
@@ -87,7 +84,7 @@ src_unpack() {
 
 src_compile() {
 	format_list() { echo $@ | tr -s \  ,; }
-	local repositories="default repository unavailable unpackaged $(usev cran) $(usev gemcutter)"
+	local repositories="default repository unavailable unpackaged $(usev gemcutter)"
 	local clients="$(usev accerso) $(usev appareo) cave $(usev instruo)"
 	local environments="default $(usev portage)"
 	econf \
@@ -123,6 +120,7 @@ src_install() {
 		insinto /usr/share/zsh/site-functions
 		doins zsh-completion/_cave
 	fi
+	find ${D} -name '*.la' -exec rm -f {} +
 }
 
 src_test() {
