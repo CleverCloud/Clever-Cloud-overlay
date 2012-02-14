@@ -1,16 +1,14 @@
+# Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-EAPI=3
-
-inherit git
-
-EGIT_BRANCH="master"
-EGIT_REPO_URI="git://git.pioto.org/paludis-scripts.git"
+EAPI="4"
+inherit git-2
 
 DESCRIPTION="Scripts for paludis, the other package mangler"
-HOMEPAGE="http://paludis.pioto.org/"
+HOMEPAGE="http://paludis.exherbo.org/"
 SRC_URI=""
+EGIT_REPO_URI="git://git.exherbo.org/paludis/paludis-scripts.git"
 
 LICENSE="GPL-2"
 SLOT="0"
@@ -21,7 +19,7 @@ DEPEND=""
 RDEPEND="sys-apps/paludis[ruby-bindings]"
 
 src_unpack() {
-	git_src_unpack
+	git-2_src_unpack
 }
 
 src_install() {
